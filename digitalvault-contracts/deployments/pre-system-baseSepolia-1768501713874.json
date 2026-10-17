@@ -1,0 +1,46 @@
+{
+  "network": "baseSepolia",
+  "deployer": "0x41521c37dB02956185437C4e2461261A321073E1",
+  "blockNumber": 36366712,
+  "timestamp": "2026-01-15T18:28:33.863Z",
+  "version": "Week 4 - PRE Integration Complete",
+  "contracts": {
+    "VaultToken": "0x9583d1643354B9C254586966343D54bCB79970D3",
+    "ContentRegistry": "0xd469e2AA709bb01ab409eBb762c655FC641C41f0",
+    "ReKeyRegistry": "0xBC835256b0D08DFeD09c7cE3B07eD945C6e243aA",
+    "Marketplace": "0xC763Ea95626100C0128c0d28E6DdED873eba91c5"
+  },
+  "transactions": [
+    {
+      "contract": "VaultToken",
+      "tx": "0x7d05389b7ac92008c4ee28bed571d93ad35dc2c43945f2a6e62d3e5a36251f5c"
+    },
+    {
+      "contract": "ContentRegistry",
+      "tx": "0xb494468c01511b7f977eb91c4381eeb6158c9d1b9326854626193566165797a3"
+    },
+    {
+      "contract": "ReKeyRegistry",
+      "tx": "0x23c0f93700583668359c3254216fdd1d04e72a0dc40525d8ecb44e2899558d02"
+    },
+    {
+      "contract": "Marketplace",
+      "tx": "0x318b0ffcfc13e6449970bf5816e95fc1a775fd2a99d3e9d557b96ce7f88c2d7e"
+    },
+    {
+      "contract": "ContentRegistry",
+      "action": "setTrustedMarketplace",
+      "tx": "0x50be9c1f9f93a582ec32d4fdf71574f0ee49b884db4ecc3a5e280c70acfd44e7"
+    },
+    {
+      "contract": "ReKeyRegistry",
+      "action": "setTrustedMarketplace",
+      "tx": "0x8aa1297aac7109d592f2e0b05bbe65181374e9d652b352ed0433c00556648bfd"
+    }
+  ],
+  "configuration": {
+    "authorizationsSet": true,
+    "contentRegistryTrustsMarketplace": false,
+    "reKeyRegistryTrustsMarketplace": true
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "@digitalvault/dao-service",
+  "version": "1.0.0",
+  "description": "DAO Governance service for DigitalVault platform",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "mocha test/**/*.test.js",
+    "test:integration": "mocha test/integration.test.js",
+    "test:watch": "mocha test/**/*.test.js --watch",
+    "logs": "tail -f logs/combined.log"
+  },
+  "keywords": ["dao", "governance", "voting", "blockchain"],
+  "author": "DigitalVault Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "dotenv": "^16.3.1",
+    "pg": "^8.11.3",
+    "ethers": "^6.9.0",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "winston": "^3.11.0",
+    "morgan": "^1.10.0",
+    "compression": "^1.7.4",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "mocha": "^10.2.0",
+    "chai": "^4.3.10",
+    "supertest": "^6.3.3"
+  }
+}

@@ -1,0 +1,51 @@
+# Bookkeeping — never belongs in the repo
+INVOICE*
+*INVOICE*
+*invoice*
+docs/INVOICE_*
+billing/
+timesheets/
+
+# Local tool state
+.claude/settings.local.json
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+.dart_tool/
+
+# Hardhat
+artifacts/
+cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Scratch files left by local tooling
+tmpclaude-*
+*.log
+
+# Local tooling state
+.claude/settings.local.json
+tmpclaude-*
+
+# Local setup notes, deployment runbooks and cheat sheets: they carry keys,
+# passwords and machine details, so they stay on the developer's machine
+CLAUDE.md
+DEPLOYMENT*.md
+CHEATSHEET.md
+DEVELOPMENT.md
+LOCAL_DEVELOPMENT.md
+WALLET_GUIDE.md
+*.log

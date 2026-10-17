@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  ipfs-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ipfs-gateway-service
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=3000
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-digitalvault_ipfs}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - PINATA_API_KEY=${PINATA_API_KEY}
+      - PINATA_SECRET_KEY=${PINATA_SECRET_KEY}
+      - PINATA_JWT=${PINATA_JWT}
+      - PINATA_GATEWAY=${PINATA_GATEWAY:-https://gateway.pinata.cloud}
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-900000}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
+      - RATE_LIMIT_UPLOAD_MAX=${RATE_LIMIT_UPLOAD_MAX:-20}
+      - MAX_FILE_SIZE=${MAX_FILE_SIZE:-104857600}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_FORMAT=${LOG_FORMAT:-json}
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - ipfs-gateway-network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: ipfs-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${DB_NAME:-digitalvault_ipfs}
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - ipfs-gateway-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  ipfs-gateway-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local

@@ -1,0 +1,294 @@
+version: '3.8'
+
+# DigitalVault Backend - Complete Stack (Week 11)
+# Production-ready services: PRE Proxy, DAO Governance, IPFS Gateway v2
+# Legacy services: metadata-indexer, storage-coordinator, notification-service
+
+services:
+  # ================================================
+  # PRODUCTION SERVICES (Weeks 8-10)
+  # ================================================
+
+  # PRE Proxy Network Service (Week 8-9)
+  pre-proxy:
+    build:
+      context: ./services/pre-proxy
+      dockerfile: Dockerfile
+    container_name: digitalvault-pre-proxy
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DB_HOST=pre-postgres
+      - DB_PORT=5432
+      - DB_NAME=digitalvault_pre
+      - DB_USER=postgres
+      - DB_PASSWORD=${PRE_DB_PASSWORD:-postgres}
+      - RPC_URL=${RPC_URL:-https://sepolia.base.org}
+      - CHAIN_ID=${CHAIN_ID:-84532}
+      - CONTENT_REGISTRY_ADDRESS=${CONTENT_REGISTRY_ADDRESS}
+      - REKEY_REGISTRY_ADDRESS=${REKEY_REGISTRY_ADDRESS}
+      - LOG_LEVEL=info
+      - CORS_ORIGIN=*
+    depends_on:
+      pre-postgres:
+        condition: service_healthy
+    volumes:
+      - ./services/pre-proxy/logs:/app/logs
+    networks:
+      - digitalvault-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/api/proxy/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      start_period: 15s
+      retries: 3
+
+  pre-postgres:
+    image: postgres:15-alpine
+    container_name: digitalvault-pre-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=digitalvault_pre
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${PRE_DB_PASSWORD:-postgres}
+    volumes:
+      - pre-postgres-data:/var/lib/postgresql/data
+    networks:
+      - digitalvault-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # DAO Governance Service (Week 9)
+  dao-service:
+    build:
+      context: ./services/dao-service
+      dockerfile: Dockerfile
+    container_name: digitalvault-dao-service
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+      - DB_HOST=dao-postgres
+      - DB_PORT=5432
+      - DB_NAME=digitalvault_dao
+      - DB_USER=postgres
+      - DB_PASSWORD=${DAO_DB_PASSWORD:-postgres}
+      - RPC_URL=${RPC_URL:-https://sepolia.base.org}
+      - CHAIN_ID=${CHAIN_ID:-84532}
+      - DAO_CONTRACT_ADDRESS=${DAO_CONTRACT_ADDRESS}
+      - VAULT_TOKEN_ADDRESS=${VAULT_TOKEN_ADDRESS}
+      - LOG_LEVEL=info
+      - CORS_ORIGIN=*
+    depends_on:
+      dao-postgres:
+        condition: service_healthy
+    volumes:
+      - ./services/dao-service/logs:/app/logs
+    networks:
+      - digitalvault-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3002/api/dao/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      start_period: 15s
+      retries: 3
+
+  dao-postgres:
+    image: postgres:15-alpine
+    container_name: digitalvault-dao-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=digitalvault_dao
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DAO_DB_PASSWORD:-postgres}
+    volumes:
+      - dao-postgres-data:/var/lib/postgresql/data
+    networks:
+      - digitalvault-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # IPFS Gateway Service v2 (Week 10)
+  ipfs-gateway:
+    build:
+      context: ./services/ipfs-gateway
+      dockerfile: Dockerfile
+    container_name: digitalvault-ipfs-gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_HOST=ipfs-postgres
+      - DB_PORT=5432
+      - DB_NAME=digitalvault_ipfs
+      - DB_USER=postgres
+      - DB_PASSWORD=${IPFS_DB_PASSWORD:-postgres}
+      - PINATA_API_KEY=${PINATA_API_KEY}
+      - PINATA_SECRET_KEY=${PINATA_SECRET_KEY}
+      - PINATA_JWT=${PINATA_JWT}
+      - PINATA_GATEWAY=https://gateway.pinata.cloud
+      - RATE_LIMIT_UPLOAD_MAX=20
+      - MAX_FILE_SIZE=104857600
+      - LOG_LEVEL=info
+      - CORS_ORIGIN=*
+    depends_on:
+      ipfs-postgres:
+        condition: service_healthy
+    volumes:
+      - ./services/ipfs-gateway/logs:/app/logs
+    networks:
+      - digitalvault-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      start_period: 15s
+      retries: 3
+
+  ipfs-postgres:
+    image: postgres:15-alpine
+    container_name: digitalvault-ipfs-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=digitalvault_ipfs
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${IPFS_DB_PASSWORD:-postgres}
+    volumes:
+      - ipfs-postgres-data:/var/lib/postgresql/data
+    networks:
+      - digitalvault-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ================================================
+  # LEGACY SERVICES (To be updated in future weeks)
+  # ================================================
+
+  # Legacy PostgreSQL (for old services)
+  postgres:
+    image: postgres:15-alpine
+    container_name: digitalvault-postgres-legacy
+    environment:
+      POSTGRES_DB: digitalvault
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${LEGACY_DB_PASSWORD:-password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - digitalvault-network
+    profiles:
+      - legacy
+
+  redis:
+    image: redis:7-alpine
+    container_name: digitalvault-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - digitalvault-network
+    profiles:
+      - legacy
+
+  # Metadata Indexer (to be updated Week 12)
+  metadata-indexer:
+    build:
+      context: .
+      dockerfile: services/metadata-indexer/Dockerfile
+    container_name: digitalvault-indexer
+    environment:
+      INDEXER_PORT: 3004
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: digitalvault
+      DB_USER: postgres
+      DB_PASSWORD: ${LEGACY_DB_PASSWORD:-password}
+      RPC_URL: ${RPC_URL}
+      CONTENT_REGISTRY_ADDRESS: ${CONTENT_REGISTRY_ADDRESS}
+    ports:
+      - "3004:3004"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - digitalvault-network
+    restart: unless-stopped
+    profiles:
+      - legacy
+
+  # Storage Coordinator (future)
+  storage-coordinator:
+    build:
+      context: .
+      dockerfile: services/storage-coordinator/Dockerfile
+    container_name: digitalvault-coordinator
+    environment:
+      COORDINATOR_PORT: 3005
+      DB_HOST: postgres
+      REDIS_URL: redis://redis:6379
+      RPC_URL: ${RPC_URL}
+    ports:
+      - "3005:3005"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - digitalvault-network
+    restart: unless-stopped
+    profiles:
+      - legacy
+
+  # Notification Service (future)
+  notification-service:
+    build:
+      context: .
+      dockerfile: services/notification-service/Dockerfile
+    container_name: digitalvault-notifications
+    environment:
+      NOTIFICATION_PORT: 3006
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
+      FIREBASE_PRIVATE_KEY: ${FIREBASE_PRIVATE_KEY}
+      FIREBASE_CLIENT_EMAIL: ${FIREBASE_CLIENT_EMAIL}
+    ports:
+      - "3006:3006"
+    networks:
+      - digitalvault-network
+    restart: unless-stopped
+    profiles:
+      - legacy
+
+volumes:
+  pre-postgres-data:
+    driver: local
+  dao-postgres-data:
+    driver: local
+  ipfs-postgres-data:
+    driver: local
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  digitalvault-network:
+    driver: bridge
+    name: digitalvault-network

@@ -1,0 +1,46 @@
+{
+  "network": "hardhat",
+  "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "blockNumber": 6,
+  "timestamp": "2026-01-15T10:00:59.082Z",
+  "version": "Week 4 - PRE Integration Complete",
+  "contracts": {
+    "VaultToken": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "ContentRegistry": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "ReKeyRegistry": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+    "Marketplace": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"
+  },
+  "transactions": [
+    {
+      "contract": "VaultToken",
+      "tx": "0xa6921f028b58603250bce0f3b6ecc186bd812e4660350f5a45cad00cc81efbd9"
+    },
+    {
+      "contract": "ContentRegistry",
+      "tx": "0x1112447f32e7c631e2fbe77b67624d4efc2a39ab35c11c41759713da3bb4fffa"
+    },
+    {
+      "contract": "ReKeyRegistry",
+      "tx": "0x908e0a4a1d024c6cabcab213da99df54206eebce2f4729d5a0f55a70bccc4fe2"
+    },
+    {
+      "contract": "Marketplace",
+      "tx": "0xe3261a6dbe83e057dbb2efebd39d496f522b75fb0c3f6fd1ce59e49cc9422e53"
+    },
+    {
+      "contract": "ContentRegistry",
+      "action": "setTrustedMarketplace",
+      "tx": "0x22d19edc0e8fc508e44e9e17b9738a086d3e11e1e9e395d729d11eadb3679b3e"
+    },
+    {
+      "contract": "ReKeyRegistry",
+      "action": "setTrustedMarketplace",
+      "tx": "0x71ccabe1f41f66b0c44a43f19cd2a0ae5a914ca5ae79d741a650a12667bd2b93"
+    }
+  ],
+  "configuration": {
+    "authorizationsSet": true,
+    "contentRegistryTrustsMarketplace": true,
+    "reKeyRegistryTrustsMarketplace": true
+  }
+}
