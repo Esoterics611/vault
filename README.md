@@ -1,5 +1,7 @@
 # DigitalVault
 
+[![Contract tests](https://github.com/Esoterics611/vault/actions/workflows/test.yml/badge.svg)](https://github.com/Esoterics611/vault/actions/workflows/test.yml)
+
 **Own your content the way you own a token.** Creators encrypt their work, store it on IPFS, and sell access on Base. When a buyer pays, a proxy re-encryption service hands them a decryption key without the content key ever being exposed, not even to the platform.
 
 | | |
